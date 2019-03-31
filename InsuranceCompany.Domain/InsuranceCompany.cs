@@ -18,7 +18,7 @@ namespace Domain
         public IPolicy SellPolicy(string nameOfInsuredObject, DateTime validFrom, short validMonths, IList<Risk> selectedRisks)
         {
             var validityPeriod = new NewValidityPeriod(validFrom, validMonths);
-            var effectivePolicies = GetPolicies(nameOfInsuredObject, validFrom);
+            var effectivePolicies = GetEffectivePolicies(nameOfInsuredObject, validFrom);
             if (effectivePolicies.Any())
             {
                 throw new ExistingEffectivePolicyException("Effective policy found that conflicts with requested validity period");
@@ -46,9 +46,16 @@ namespace Domain
             policyAggregate.AddRisk(risk, validFrom);
         }
 
+        public void RemoveRisk(string nameOfInsuredObject, Risk risk, DateTime validTill, DateTime effectiveDate)
+        {
+            var policy = GetPolicy(nameOfInsuredObject, effectiveDate);
+            var policyAggregate = new PolicyAggregate(policy);
+            policyAggregate.RemoveRisk(risk, validTill);
+        }
+
         public IPolicy GetPolicy(string nameOfInsuredObject, DateTime effectiveDate)
         {
-            var effectivePolicies = GetPolicies(nameOfInsuredObject, effectiveDate);
+            var effectivePolicies = GetEffectivePolicies(nameOfInsuredObject, effectiveDate);
             if (effectivePolicies == null || !effectivePolicies.Any())
             {
                 throw new EffectivePolicyNotFoundException("Effective policy for requested arguments could not be found"); 
@@ -61,7 +68,7 @@ namespace Domain
             return effectivePolicies.Single();
         }
 
-        private IEnumerable<IPolicy> GetPolicies(string nameOfInsuredObject, DateTime effectiveDate)
+        private IEnumerable<IPolicy> GetEffectivePolicies(string nameOfInsuredObject, DateTime effectiveDate)
         {
             return policyRepository.FindByNameOfInsuredObject(nameOfInsuredObject)
                 .Where(p => p.ValidFrom <= effectiveDate)

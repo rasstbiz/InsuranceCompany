@@ -96,5 +96,55 @@ namespace InsurancyCompany.Domain.Tests
 
             Assert.NotEqual(originalPremium, policy.Premium);
         }
+
+        [Fact]
+        public void ThrowIfAddedRiskAlreadyInsured()
+        {
+            var validFrom = DateTime.Now;
+            var risk = fixture.Create<Risk>();
+            var policy = fixture
+                .Build<Policy>()
+                .With(p => p.ValidTill, validFrom.AddMonths(3))
+                .With(p => p.InsuredRisks, new List<Risk> { risk })
+                .Create();
+            var originalPremium = policy.Premium;
+
+            var policyAggregate = new PolicyAggregate(policy);
+
+            Assert.Throws<ExistingRiskException>(() => 
+                policyAggregate.AddRisk(risk, validFrom));
+        }
+
+        [Fact]
+        public void ThrowIfRemovedRiskIsNotInsured()
+        {
+            var validTill = DateTime.Now.AddDays(100);
+            var risk = fixture.Create<Risk>();
+            var policy = fixture.Create<Policy>();
+
+            var policyAggregate = new PolicyAggregate(policy);
+
+            Assert.Throws<InvalidRiskException>(() =>
+                policyAggregate.RemoveRisk(risk, validTill));
+        }
+
+        [Fact]
+        public void RecalculatePremiumForRemovedRisk()
+        {
+            var validTill = DateTime.Now;
+            var risk = fixture.Create<Risk>();
+            var policy = fixture
+                .Build<Policy>()
+                .With(p => p.ValidTill, validTill.AddMonths(3))
+                .With(p => p.InsuredRisks, new List<Risk> { risk })
+                .Create();
+            var originalPremium = policy.Premium;
+
+            var policyAggregate = new PolicyAggregate(policy);
+
+            policyAggregate.RemoveRisk(risk, validTill);
+
+            Assert.NotEqual(originalPremium, policy.Premium);
+        }
     }
 }

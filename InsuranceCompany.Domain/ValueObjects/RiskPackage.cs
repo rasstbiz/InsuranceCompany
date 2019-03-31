@@ -6,9 +6,9 @@ namespace Domain
 {
     public class RiskPackage
     {
-        private readonly Dictionary<string, InsuredPeriod> insuredRisks;
+        private readonly Dictionary<string, RiskValidityPeriod> insuredRisks;
 
-        public RiskPackage(IList<Risk> insuredRisks, ValidityPeriod validityPeriod, params InsuredPeriod[] additionalInsuredPeriods)
+        public RiskPackage(IList<Risk> insuredRisks, ValidityPeriod validityPeriod, params RiskValidityPeriod[] additionalInsuredPeriods)
         {
             if (validityPeriod == null)
             {
@@ -20,7 +20,7 @@ namespace Domain
             }
 
             this.insuredRisks = insuredRisks.ToDictionary(
-                r => r.Name, r => new InsuredPeriod(validityPeriod, r));
+                r => r.Name, r => new RiskValidityPeriod(validityPeriod, r));
 
             foreach (var additionalInsuredPeriod in additionalInsuredPeriods)
             {

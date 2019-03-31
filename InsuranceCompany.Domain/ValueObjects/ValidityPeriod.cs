@@ -28,6 +28,10 @@ namespace Domain
             {
                 throw new InvalidValidityPeriodException("Valid Till date can not be in the past");
             }
+            if (validFrom > validTill)
+            {
+                throw new InvalidValidityPeriodException("Valid From date can not be greater that Valid Till date");
+            }
 
             From = validFrom.Date;
             Till = validTill.Date;

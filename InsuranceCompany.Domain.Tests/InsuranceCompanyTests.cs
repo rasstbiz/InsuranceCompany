@@ -214,6 +214,40 @@ public class InsuranceCompanyShould
         Assert.True(policy.InsuredRisks.Contains(risk));
     }
 
+    [Fact]
+    public void ThrowWhenNoEffectivePolicyFoundForRemovedRisk()
+    {
+        var nameOfInsuredObject = fixture.Create<string>();
+        var validTill = DateTime.Now.Date.AddDays(10);
+        var effectiveDate = DateTime.Now;
+        var risk = fixture.Create<Risk>();
+
+        MakeRepositoryReturnEffectivePolicies(nameOfInsuredObject, effectiveDate, 0);
+
+        var insuranceCompany = fixture.Create<InsuranceCompany>();
+
+        Assert.Throws<EffectivePolicyNotFoundException>(() =>
+            insuranceCompany.RemoveRisk(nameOfInsuredObject, risk, validTill, effectiveDate));
+    }
+
+    [Fact]
+    public void RemoveRiskFromExistingPolicy()
+    {
+        var nameOfInsuredObject = fixture.Create<string>();
+        var validTill = DateTime.Now.Date.AddDays(50);
+        var effectiveDate = DateTime.Now;
+        var risk = fixture.Create<Risk>();
+
+        var policy = MakeRepositoryReturnEffectivePolicies(nameOfInsuredObject, effectiveDate, 1).First();
+        policy.InsuredRisks.Add(risk);
+
+        var insuranceCompany = fixture.Create<InsuranceCompany>();
+
+        insuranceCompany.RemoveRisk(nameOfInsuredObject, risk, validTill, effectiveDate);
+
+        Assert.True(!policy.InsuredRisks.Contains(risk));
+    }
+
     private IEnumerable<IPolicy> MakeRepositoryReturnEffectivePolicies(
         string nameOfInsuredObject,
         DateTime effectiveDate,

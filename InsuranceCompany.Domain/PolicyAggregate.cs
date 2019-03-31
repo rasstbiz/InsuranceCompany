@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Domain
 {
@@ -29,11 +30,30 @@ namespace Domain
 
         public void AddRisk(Risk risk, DateTime validFrom)
         {
-            var validityPeriodForNewRisk = new ValidityPeriod(validFrom, policy.ValidTill);
-            var newInsuredPeriod = new InsuredPeriod(validityPeriodForNewRisk, risk);
+            if (policy.InsuredRisks.Any(r => r.Name.ToLowerInvariant() == risk.Name.ToLowerInvariant()))
+            {
+                throw new ExistingRiskException("Risk with such name is already insured");
+            }
 
-            policy.Premium += newInsuredPeriod.CalculatePremium();
+            var validityPeriod = new ValidityPeriod(validFrom, policy.ValidTill);
+            var newRiskValidityPeriod = new RiskValidityPeriod(validityPeriod, risk);
+
+            policy.Premium += newRiskValidityPeriod.CalculatePremium();
             policy.InsuredRisks.Add(risk);
+        }
+
+        public void RemoveRisk(Risk risk, DateTime validTill)
+        {
+            if (!policy.InsuredRisks.Any(r => r.Name.ToLowerInvariant() == risk.Name.ToLowerInvariant()))
+            {
+                throw new InvalidRiskException("Risk with such name is not insured");
+            }
+
+            var validityPeriod = new ValidityPeriod(validTill.AddMonths(1), policy.ValidTill);
+            var nonInsuredRiskPeriod = new RiskValidityPeriod(validityPeriod, risk);
+
+            policy.Premium -= nonInsuredRiskPeriod.CalculatePremium();
+            policy.InsuredRisks.Remove(risk);
         }
     }
 }

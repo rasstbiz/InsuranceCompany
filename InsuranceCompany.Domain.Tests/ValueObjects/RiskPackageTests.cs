@@ -71,7 +71,7 @@ namespace InsurancyCompany.Domain.Tests
                 Name = fixture.Create<string>(),
                 YearlyPrice = 50
             };
-            var additionalInsuredPeriod = new InsuredPeriod(additionalValidityPeriod, additionalRisk);
+            var additionalInsuredPeriod = new RiskValidityPeriod(additionalValidityPeriod, additionalRisk);
             var validityPeriod = new ValidityPeriod(DateTime.Now, 12);
             var insuredRisks = new List<Risk>
             {

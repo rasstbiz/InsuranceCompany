@@ -2,14 +2,14 @@
 
 namespace Domain
 {
-    public class InsuredPeriod
+    public class RiskValidityPeriod
     {
         public string RiskName { get; }
 
         private readonly ValidityPeriod validityPeriod;
         private readonly Risk risk;
 
-        public InsuredPeriod(ValidityPeriod validityPeriod, Risk risk)
+        public RiskValidityPeriod(ValidityPeriod validityPeriod, Risk risk)
         {
             if (validityPeriod == null)
             {
