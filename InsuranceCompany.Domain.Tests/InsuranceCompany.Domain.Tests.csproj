@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <RootNamespace>InsurancyCompany.Domain.Tests</RootNamespace>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoFixture" Version="4.8.0" />
+    <PackageReference Include="AutoFixture.AutoNSubstitute" Version="4.8.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+    <PackageReference Include="NSubstitute" Version="4.0.0" />
+    <PackageReference Include="xunit" Version="2.4.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\InsuranceCompany.Domain\InsuranceCompany.Domain.csproj" />
+    <ProjectReference Include="..\InsuranceCompany.Sdk\InsuranceCompany.Sdk.csproj" />
+  </ItemGroup>
+
+</Project>
