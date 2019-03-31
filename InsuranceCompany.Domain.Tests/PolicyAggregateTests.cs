@@ -78,5 +78,23 @@ namespace InsurancyCompany.Domain.Tests
 
             Assert.True(policy.Premium > 0m);
         }
+
+        [Fact]
+        public void RecalculatePremiumForNewlyAddedRisk()
+        {
+            var validFrom = DateTime.Now;
+            var risk = fixture.Create<Risk>();
+            var policy = fixture
+                .Build<Policy>()
+                .With(p => p.ValidTill, validFrom.AddMonths(3))
+                .Create();
+            var originalPremium = policy.Premium;
+
+            var policyAggregate = new PolicyAggregate(policy);
+
+            policyAggregate.AddRisk(risk, validFrom);
+
+            Assert.NotEqual(originalPremium, policy.Premium);
+        }
     }
 }

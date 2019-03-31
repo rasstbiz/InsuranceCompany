@@ -17,7 +17,7 @@ namespace Domain
 
         public IPolicy SellPolicy(string nameOfInsuredObject, DateTime validFrom, short validMonths, IList<Risk> selectedRisks)
         {
-            var validityPeriod = new ValidityPeriod(validFrom, validMonths);
+            var validityPeriod = new NewValidityPeriod(validFrom, validMonths);
             var effectivePolicies = GetPolicies(nameOfInsuredObject, validFrom);
             if (effectivePolicies.Any())
             {
@@ -32,6 +32,18 @@ namespace Domain
             var policyAggregate = new PolicyAggregate(policy);
             policyAggregate.Create(nameOfInsuredObject, validityPeriod, selectedRisks);
             return policy;
+        }
+
+        public void AddRisk(string nameOfInsuredObject, Risk risk, DateTime validFrom, DateTime effectiveDate)
+        {
+            if (!AvailableRisks.Contains(risk))
+            {
+                throw new AddedRiskUnavailableException("Added risk is not avaiable for selling");
+            }
+
+            var policy = GetPolicy(nameOfInsuredObject, effectiveDate);
+            var policyAggregate = new PolicyAggregate(policy);
+            policyAggregate.AddRisk(risk, validFrom);
         }
 
         public IPolicy GetPolicy(string nameOfInsuredObject, DateTime effectiveDate)

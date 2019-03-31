@@ -163,6 +163,57 @@ public class InsuranceCompanyShould
         Assert.True(policy.Premium > 0m);
     }
 
+    [Fact]
+    public void ThrowIfAddedRiskIsNotAvailable()
+    {
+        var nameOfInsuredObject = fixture.Create<string>();
+        var validFrom = DateTime.Now.Date.AddDays(1);
+        var effectiveDate = validFrom;
+        var risk = fixture.Create<Risk>();
+
+        MakeRepositoryReturnEffectivePolicies(nameOfInsuredObject, validFrom, 1);
+
+        var insuranceCompany = fixture.Create<InsuranceCompany>();
+
+        Assert.Throws<AddedRiskUnavailableException>(() =>
+            insuranceCompany.AddRisk(nameOfInsuredObject, risk, validFrom, effectiveDate));
+    }
+
+    [Fact]
+    public void ThrowWhenNoEffectivePolicyFoundForAddedRisk()
+    {
+        var nameOfInsuredObject = fixture.Create<string>();
+        var validFrom = DateTime.Now.Date.AddDays(1);
+        var effectiveDate = validFrom;
+        var risk = fixture.Create<Risk>();
+
+        MakeRepositoryReturnEffectivePolicies(nameOfInsuredObject, effectiveDate, 0);
+
+        var insuranceCompany = fixture.Create<InsuranceCompany>();
+        insuranceCompany.AvailableRisks = new List<Risk> { risk };
+
+        Assert.Throws<EffectivePolicyNotFoundException>(() =>
+            insuranceCompany.AddRisk(nameOfInsuredObject, risk, validFrom, effectiveDate));
+    }
+
+    [Fact]
+    public void AddRiskToExistingPolicy()
+    {
+        var nameOfInsuredObject = fixture.Create<string>();
+        var validFrom = DateTime.Now.Date.AddDays(1);
+        var effectiveDate = validFrom;
+        var risk = fixture.Create<Risk>();
+
+        var policy = MakeRepositoryReturnEffectivePolicies(nameOfInsuredObject, effectiveDate, 1).First();
+
+        var insuranceCompany = fixture.Create<InsuranceCompany>();
+        insuranceCompany.AvailableRisks = new List<Risk> { risk };
+
+        insuranceCompany.AddRisk(nameOfInsuredObject, risk, validFrom, effectiveDate);
+
+        Assert.True(policy.InsuredRisks.Contains(risk));
+    }
+
     private IEnumerable<IPolicy> MakeRepositoryReturnEffectivePolicies(
         string nameOfInsuredObject,
         DateTime effectiveDate,

@@ -6,7 +6,9 @@ namespace Domain
 {
     public class RiskPackage
     {
-        public RiskPackage(IList<Risk> insuredRisks, ValidityPeriod validityPeriod)
+        private readonly Dictionary<string, InsuredPeriod> insuredRisks;
+
+        public RiskPackage(IList<Risk> insuredRisks, ValidityPeriod validityPeriod, params InsuredPeriod[] additionalInsuredPeriods)
         {
             if (validityPeriod == null)
             {
@@ -16,11 +18,19 @@ namespace Domain
             {
                 throw new MissingInitialInsuredRisksException("Missing initial Insured Risks");
             }
+
+            this.insuredRisks = insuredRisks.ToDictionary(
+                r => r.Name, r => new InsuredPeriod(validityPeriod, r));
+
+            foreach (var additionalInsuredPeriod in additionalInsuredPeriods)
+            {
+                this.insuredRisks.Add(additionalInsuredPeriod.RiskName, additionalInsuredPeriod);
+            }
         }
 
-        public decimal Sum()
+        public decimal CalculatePremium()
         {
-            return 20m;
+            return insuredRisks.Sum(r => r.Value.CalculatePremium());
         }
     }
 }
