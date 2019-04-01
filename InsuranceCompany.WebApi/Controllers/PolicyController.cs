@@ -19,11 +19,6 @@ namespace WebApi.Controllers
         [HttpGet]
         public IActionResult Get([FromQuery]string nameOfInsuredObject, [FromQuery]DateTime effectiveDate)
         {
-            var notFoundResult = NotFound(new
-            {
-                nameOfInsuredObject,
-                effectiveDate
-            });
             try
             {
                 var insuranceCompany = insuranceCompanyService.Get();
@@ -31,11 +26,11 @@ namespace WebApi.Controllers
             }
             catch (EffectivePolicyNotFoundException)
             {
-                return notFoundResult;
-            }
-            catch (MultipleEffectivePoliciesFoundException)
-            {
-                return notFoundResult;
+                return NotFound(new
+                {
+                    nameOfInsuredObject,
+                    effectiveDate
+                });
             }
         }
 
@@ -53,7 +48,7 @@ namespace WebApi.Controllers
                     request.SelectedRisks.ToList());
                 return Ok(result);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
@@ -61,16 +56,16 @@ namespace WebApi.Controllers
 
         [HttpPost]
         [Route("addrisk")]
-        public IActionResult AddRisk(
-            [FromBody] string nameOfInsuredObject,
-            [FromBody] DateTime validFrom,
-            [FromBody] Risk risk,
-            [FromBody] DateTime effectiveDate)
+        public IActionResult AddRisk([FromBody]AddRiskRequest request)
         {
             try
             {
                 var insuranceCompany = insuranceCompanyService.Get();
-                insuranceCompany.AddRisk(nameOfInsuredObject, risk, validFrom, effectiveDate);
+                insuranceCompany.AddRisk(
+                    request.NameOfInsuredObject, 
+                    request.Risk, 
+                    request.ValidFrom, 
+                    request.EffectiveDate);
                 return Ok();
             }
             catch (Exception)
@@ -81,16 +76,16 @@ namespace WebApi.Controllers
 
         [HttpPost]
         [Route("removerisk")]
-        public IActionResult RemoveRisk(
-            [FromBody] string nameOfInsuredObject,
-            [FromBody] DateTime validTill,
-            [FromBody] Risk risk,
-            [FromBody] DateTime effectiveDate)
+        public IActionResult RemoveRisk([FromBody]RemoveRiskRequest request)
         {
             try
             {
                 var insuranceCompany = insuranceCompanyService.Get();
-                insuranceCompany.RemoveRisk(nameOfInsuredObject, risk, validTill, effectiveDate);
+                insuranceCompany.RemoveRisk(
+                    request.NameOfInsuredObject, 
+                    request.Risk, 
+                    request.ValidTill, 
+                    request.EffectiveDate);
                 return Ok();
             }
             catch (Exception)
