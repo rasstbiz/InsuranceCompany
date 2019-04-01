@@ -13,19 +13,19 @@ namespace Domain
             this.policy = policy;
         }
 
-        public void Create(string nameOfInsuredObject, ValidityPeriod validityPeriod, IList<Risk> insuredRisks)
+        public void Create(string nameOfInsuredObject, InsurancePeriod insurancePeriod, IList<Risk> insuredRisks)
         {
             if (string.IsNullOrEmpty(nameOfInsuredObject))
             {
                 throw new MissingNameOfInsuredObjectException("Missing Name of Insured Object");
             }
 
-            var riskPackage = new RiskPackage(insuredRisks, validityPeriod);
+            var initialRiskSet = new InitialRiskSet(insuredRisks, insurancePeriod);
             policy.NameOfInsuredObject = nameOfInsuredObject;
-            policy.ValidFrom = validityPeriod.From;
-            policy.ValidTill = validityPeriod.Till;
+            policy.ValidFrom = insurancePeriod.From;
+            policy.ValidTill = insurancePeriod.Till;
             policy.InsuredRisks = insuredRisks;
-            policy.Premium = riskPackage.CalculatePremium();
+            policy.Premium = initialRiskSet.CalculatePremium();
         }
 
         public void AddRisk(Risk risk, DateTime validFrom)
@@ -35,10 +35,10 @@ namespace Domain
                 throw new ExistingRiskException("Risk with such name is already insured");
             }
 
-            var validityPeriod = new ValidityPeriod(validFrom, policy.ValidTill);
-            var newRiskValidityPeriod = new RiskValidityPeriod(validityPeriod, risk);
+            var insurancePeriod = new InsurancePeriod(validFrom, policy.ValidTill);
+            var newRiskInsurancePeriod = new RiskInsurancePeriod(insurancePeriod, risk);
 
-            policy.Premium += newRiskValidityPeriod.CalculatePremium();
+            policy.Premium += newRiskInsurancePeriod.CalculatePremium();
             policy.InsuredRisks.Add(risk);
         }
 
@@ -49,8 +49,8 @@ namespace Domain
                 throw new InvalidRiskException("Risk with such name is not insured");
             }
 
-            var validityPeriod = new ValidityPeriod(validTill.AddMonths(1), policy.ValidTill);
-            var nonInsuredRiskPeriod = new RiskValidityPeriod(validityPeriod, risk);
+            var insurancePeriod = new InsurancePeriod(validTill.AddMonths(1), policy.ValidTill);
+            var nonInsuredRiskPeriod = new RiskInsurancePeriod(insurancePeriod, risk);
 
             policy.Premium -= nonInsuredRiskPeriod.CalculatePremium();
             policy.InsuredRisks.Remove(risk);

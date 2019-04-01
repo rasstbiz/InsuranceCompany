@@ -4,20 +4,23 @@ using System.Linq;
 
 namespace Domain
 {
-    public class InsuranceCompany
+    public class InsuranceCompany : IInsuranceCompany
     {
-        public IEnumerable<Risk> AvailableRisks { get; set; }
+        public string Name { get; }
+
+        public IList<Risk> AvailableRisks { get; set; }
 
         private readonly IPolicyRepository policyRepository;
 
-        public InsuranceCompany(IPolicyRepository policyRepository)
+        public InsuranceCompany(string name, IPolicyRepository policyRepository)
         {
+            this.Name = name;
             this.policyRepository = policyRepository;
         }
 
         public IPolicy SellPolicy(string nameOfInsuredObject, DateTime validFrom, short validMonths, IList<Risk> selectedRisks)
         {
-            var validityPeriod = new NewValidityPeriod(validFrom, validMonths);
+            var insurancePeriod = new NewInsurancePeriod(validFrom, validMonths);
             var effectivePolicies = GetEffectivePolicies(nameOfInsuredObject, validFrom);
             if (effectivePolicies.Any())
             {
@@ -30,7 +33,8 @@ namespace Domain
 
             var policy = new Policy();
             var policyAggregate = new PolicyAggregate(policy);
-            policyAggregate.Create(nameOfInsuredObject, validityPeriod, selectedRisks);
+            policyAggregate.Create(nameOfInsuredObject, insurancePeriod, selectedRisks);
+            policyRepository.Add(policy);
             return policy;
         }
 
@@ -41,19 +45,26 @@ namespace Domain
                 throw new AddedRiskUnavailableException("Added risk is not avaiable for selling");
             }
 
-            var policy = GetPolicy(nameOfInsuredObject, effectiveDate);
+            var policy = GetInternalPolicy(nameOfInsuredObject, effectiveDate);
             var policyAggregate = new PolicyAggregate(policy);
             policyAggregate.AddRisk(risk, validFrom);
+            policyRepository.Update(policy);
         }
 
         public void RemoveRisk(string nameOfInsuredObject, Risk risk, DateTime validTill, DateTime effectiveDate)
         {
-            var policy = GetPolicy(nameOfInsuredObject, effectiveDate);
+            var policy = GetInternalPolicy(nameOfInsuredObject, effectiveDate);
             var policyAggregate = new PolicyAggregate(policy);
             policyAggregate.RemoveRisk(risk, validTill);
+            policyRepository.Update(policy);
         }
 
         public IPolicy GetPolicy(string nameOfInsuredObject, DateTime effectiveDate)
+        {
+            return GetInternalPolicy(nameOfInsuredObject, effectiveDate);
+        }
+
+        private Policy GetInternalPolicy(string nameOfInsuredObject, DateTime effectiveDate)
         {
             var effectivePolicies = GetEffectivePolicies(nameOfInsuredObject, effectiveDate);
             if (effectivePolicies == null || !effectivePolicies.Any())
@@ -68,7 +79,7 @@ namespace Domain
             return effectivePolicies.Single();
         }
 
-        private IEnumerable<IPolicy> GetEffectivePolicies(string nameOfInsuredObject, DateTime effectiveDate)
+        private IEnumerable<Policy> GetEffectivePolicies(string nameOfInsuredObject, DateTime effectiveDate)
         {
             return policyRepository.FindByNameOfInsuredObject(nameOfInsuredObject)
                 .Where(p => p.ValidFrom <= effectiveDate)

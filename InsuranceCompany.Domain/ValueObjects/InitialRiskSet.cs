@@ -4,15 +4,15 @@ using System.Linq;
 
 namespace Domain
 {
-    public class RiskPackage
+    public class InitialRiskSet
     {
-        private readonly Dictionary<string, RiskValidityPeriod> insuredRisks;
+        private readonly Dictionary<string, RiskInsurancePeriod> insuredRisks;
 
-        public RiskPackage(IList<Risk> insuredRisks, ValidityPeriod validityPeriod, params RiskValidityPeriod[] additionalInsuredPeriods)
+        public InitialRiskSet(IList<Risk> insuredRisks, InsurancePeriod insurancePeriod, params RiskInsurancePeriod[] additionalInsuredPeriods)
         {
-            if (validityPeriod == null)
+            if (insurancePeriod == null)
             {
-                throw new ArgumentNullException(nameof(validityPeriod));
+                throw new ArgumentNullException(nameof(insurancePeriod));
             }
             if (insuredRisks == null || !insuredRisks.Any())
             {
@@ -20,7 +20,7 @@ namespace Domain
             }
 
             this.insuredRisks = insuredRisks.ToDictionary(
-                r => r.Name, r => new RiskValidityPeriod(validityPeriod, r));
+                r => r.Name, r => new RiskInsurancePeriod(insurancePeriod, r));
 
             foreach (var additionalInsuredPeriod in additionalInsuredPeriods)
             {

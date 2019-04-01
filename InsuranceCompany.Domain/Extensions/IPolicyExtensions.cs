@@ -2,9 +2,9 @@
 {
     public static class IPolicyExtensions
     {
-        public static ValidityPeriod GetValidityPeriod(this IPolicy policy)
+        public static InsurancePeriod GetInsurancePeriod(this IPolicy policy)
         {
-            return new ValidityPeriod(policy.ValidFrom, policy.ValidTill);
+            return new InsurancePeriod(policy.ValidFrom, policy.ValidTill);
         }
     }
 }

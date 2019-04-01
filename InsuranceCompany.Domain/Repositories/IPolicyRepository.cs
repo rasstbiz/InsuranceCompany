@@ -4,6 +4,10 @@ namespace Domain
 {
     public interface IPolicyRepository
     {
-        IEnumerable<IPolicy> FindByNameOfInsuredObject(string nameOfInsuredObject);
+        IEnumerable<Policy> FindByNameOfInsuredObject(string nameOfInsuredObject);
+
+        void Add(Policy policy);
+
+        void Update(Policy policy);
     }
 }

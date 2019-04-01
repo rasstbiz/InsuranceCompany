@@ -77,7 +77,7 @@ public class InsuranceCompanyShould
     }
 
     [Fact]
-    public void ThrowWhenValidityPeriodForNewPolicyClashesWithExisting()
+    public void ThrowWheninsurancePeriodForNewPolicyClashesWithExisting()
     {
         var nameOfInsuredObject = fixture.Create<string>();
         var validFrom = DateTime.Now.Date.AddDays(1);
@@ -104,7 +104,7 @@ public class InsuranceCompanyShould
 
         var insuranceCompany = fixture.Create<InsuranceCompany>();
 
-        Assert.Throws<InvalidValidityPeriodException>(() =>
+        Assert.Throws<InvalidInsurancePeriodException>(() =>
             insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, selectedRisks));
     }
 
@@ -121,7 +121,7 @@ public class InsuranceCompanyShould
 
         var insuranceCompany = fixture.Create<InsuranceCompany>();
 
-        Assert.Throws<InvalidValidityPeriodException>(() =>
+        Assert.Throws<InvalidInsurancePeriodException>(() =>
             insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, selectedRisks));
     }
 
@@ -240,6 +240,7 @@ public class InsuranceCompanyShould
 
         var policy = MakeRepositoryReturnEffectivePolicies(nameOfInsuredObject, effectiveDate, 1).First();
         policy.InsuredRisks.Add(risk);
+        policy.ValidTill = validTill.AddMonths(2);
 
         var insuranceCompany = fixture.Create<InsuranceCompany>();
 

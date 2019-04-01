@@ -23,13 +23,13 @@ namespace InsurancyCompany.Domain.Tests
         public void ThrowIfInsuredObjectNameIsNullOrEmpty(string nameOfInsuredObject)
         {
             var policy = new Policy();
-            var validityPeriod = new ValidityPeriod(DateTime.Now, fixture.Create<short>());
+            var insurancePeriod = new InsurancePeriod(DateTime.Now, fixture.Create<short>());
             var insuredRisks = fixture.CreateMany<Risk>().ToList();
 
             var policyAggregate = new PolicyAggregate(policy);
 
             Assert.Throws<MissingNameOfInsuredObjectException>(() => 
-                policyAggregate.Create(nameOfInsuredObject, validityPeriod, insuredRisks));
+                policyAggregate.Create(nameOfInsuredObject, insurancePeriod, insuredRisks));
         }
         
         [Fact]
@@ -37,13 +37,13 @@ namespace InsurancyCompany.Domain.Tests
         {
             var policy = new Policy();
             var nameOfInsuredObject = fixture.Create<string>();
-            var validityPeriod = new ValidityPeriod(DateTime.Now, fixture.Create<short>());
+            var insurancePeriod = new InsurancePeriod(DateTime.Now, fixture.Create<short>());
             var insuredRisks = new List<Risk>();
 
             var policyAggregate = new PolicyAggregate(policy);
 
             Assert.Throws<MissingInitialInsuredRisksException>(() =>
-                policyAggregate.Create(nameOfInsuredObject, validityPeriod, insuredRisks));
+                policyAggregate.Create(nameOfInsuredObject, insurancePeriod, insuredRisks));
         }
 
         [Fact]
@@ -51,16 +51,16 @@ namespace InsurancyCompany.Domain.Tests
         {
             var policy = new Policy();
             var nameOfInsuredObject = fixture.Create<string>();
-            var validityPeriod = new ValidityPeriod(DateTime.Now, fixture.Create<short>());
+            var insurancePeriod = new InsurancePeriod(DateTime.Now, fixture.Create<short>());
             var insuredRisks = fixture.CreateMany<Risk>().ToList();
 
             var policyAggregate = new PolicyAggregate(policy);
 
-            policyAggregate.Create(nameOfInsuredObject, validityPeriod, insuredRisks);
+            policyAggregate.Create(nameOfInsuredObject, insurancePeriod, insuredRisks);
 
             Assert.Equal(nameOfInsuredObject, policy.NameOfInsuredObject);
-            Assert.Equal(validityPeriod.From, policy.ValidFrom);
-            Assert.Equal(validityPeriod.Till, policy.ValidTill);
+            Assert.Equal(insurancePeriod.From, policy.ValidFrom);
+            Assert.Equal(insurancePeriod.Till, policy.ValidTill);
             Assert.Equal(insuredRisks, policy.InsuredRisks);
         }
 
@@ -69,12 +69,12 @@ namespace InsurancyCompany.Domain.Tests
         {
             var policy = new Policy();
             var nameOfInsuredObject = fixture.Create<string>();
-            var validityPeriod = new ValidityPeriod(DateTime.Now, fixture.Create<short>());
+            var insurancePeriod = new InsurancePeriod(DateTime.Now, fixture.Create<short>());
             var insuredRisks = fixture.CreateMany<Risk>().ToList();
 
             var policyAggregate = new PolicyAggregate(policy);
 
-            policyAggregate.Create(nameOfInsuredObject, validityPeriod, insuredRisks);
+            policyAggregate.Create(nameOfInsuredObject, insurancePeriod, insuredRisks);
 
             Assert.True(policy.Premium > 0m);
         }
