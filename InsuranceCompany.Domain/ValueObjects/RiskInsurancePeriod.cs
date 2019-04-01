@@ -24,7 +24,11 @@ namespace Domain
 
         public decimal CalculatePremium()
         {
-            return (risk.YearlyPrice / 12) * insurancePeriod.PremiumMonths;
+            var monthlyPrice = risk.YearlyPrice / 12;
+            var precisePremium = monthlyPrice * insurancePeriod.PremiumMonths;
+            var roundedPremium = Math.Round(precisePremium);
+
+            return roundedPremium;
         }
     }
 }
