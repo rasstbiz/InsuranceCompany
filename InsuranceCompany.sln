@@ -7,9 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InsuranceCompany.WebApi", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InsuranceCompany.Sdk", "InsuranceCompany.Sdk\InsuranceCompany.Sdk.csproj", "{530BC5CE-1B71-453B-863E-43A681721C71}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InsuranceCompany.Domain", "InsuranceCompany.Domain\InsuranceCompany.Domain.csproj", "{F8E93013-D6A9-464D-AF44-3021A067E796}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InsuranceCompany.Domain", "InsuranceCompany.Domain\InsuranceCompany.Domain.csproj", "{F8E93013-D6A9-464D-AF44-3021A067E796}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InsuranceCompany.Domain.Tests", "InsuranceCompany.Domain.Tests\InsuranceCompany.Domain.Tests.csproj", "{8A67D559-7857-47CC-A5FB-8180CFDFBB7A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InsuranceCompany.DataAccess", "InsuranceCompany.DataAccess\InsuranceCompany.DataAccess.csproj", "{743DBC0E-08DC-48DB-9184-A52697B1FEC4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{8A67D559-7857-47CC-A5FB-8180CFDFBB7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A67D559-7857-47CC-A5FB-8180CFDFBB7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8A67D559-7857-47CC-A5FB-8180CFDFBB7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{743DBC0E-08DC-48DB-9184-A52697B1FEC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{743DBC0E-08DC-48DB-9184-A52697B1FEC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{743DBC0E-08DC-48DB-9184-A52697B1FEC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{743DBC0E-08DC-48DB-9184-A52697B1FEC4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

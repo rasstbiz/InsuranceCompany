@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using DataAccess;
+using Domain;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.Swagger;
 
-namespace InsuranceCompany.WebApi
+namespace WebApi
 {
     public class Startup
     {
@@ -24,6 +21,17 @@ namespace InsuranceCompany.WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
+            services.AddTransient<IAvailableRiskRepository, AvailableRiskRepository>();
+            services.AddTransient<IInsuranceCompanyService, InsuranceCompanyService>();
+            services.AddTransient<IPolicyRepository, PolicyRepository>();
+            services.AddTransient<IInsuranceCompany, InsuranceCompany>(provider => 
+                new InsuranceCompany("IF", provider.GetService<IPolicyRepository>()));
+            
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "InsuranceCompany API", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -33,6 +41,12 @@ namespace InsuranceCompany.WebApi
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "InsuranceCompany API V1");
+            });
 
             app.UseMvc();
         }
