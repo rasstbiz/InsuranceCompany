@@ -23,7 +23,7 @@ public class InsuranceCompanyShould
     public void GetPolicyFromRepository()
     {
         var nameOfInsuredObject = fixture.Create<string>();
-        var effectiveDate = fixture.Create<DateTime>();
+        var effectiveDate = DateTime.Now.AddDays(1);
 
         var policies = MakeRepositoryReturnEffectivePolicies(nameOfInsuredObject, effectiveDate, 1);
 
@@ -38,7 +38,7 @@ public class InsuranceCompanyShould
     public void ThrowWhenMultipleEffectivePoliciesFoundForRequestedArgs()
     {
         var nameOfInsuredObject = fixture.Create<string>();
-        var effectiveDate = fixture.Create<DateTime>();
+        var effectiveDate = DateTime.Now.AddDays(1);
 
         MakeRepositoryReturnEffectivePolicies(nameOfInsuredObject, effectiveDate, 2);
 
@@ -52,7 +52,7 @@ public class InsuranceCompanyShould
     public void ThrowWhenNoEffectivePolicyFoundForRequestedArgs()
     {
         var nameOfInsuredObject = fixture.Create<string>();
-        var effectiveDate = fixture.Create<DateTime>();
+        var effectiveDate = DateTime.Now.AddDays(1);
 
         MakeRepositoryReturnEffectivePolicies(nameOfInsuredObject, effectiveDate, 0);
 
@@ -66,7 +66,7 @@ public class InsuranceCompanyShould
     public void ValidateEffectiveDateForPolicy()
     {
         var nameOfInsuredObject = fixture.Create<string>();
-        var effectiveDate = fixture.Create<DateTime>();
+        var effectiveDate = DateTime.Now.AddDays(1);
 
         MakeRepositoryReturnIneffectivePolicies(nameOfInsuredObject, effectiveDate, 2);
 
@@ -77,7 +77,7 @@ public class InsuranceCompanyShould
     }
 
     [Fact]
-    public void ThrowWheninsurancePeriodForNewPolicyClashesWithExisting()
+    public void ThrowWhenValidFromDateForNewPolicyClashesWithExisting()
     {
         var nameOfInsuredObject = fixture.Create<string>();
         var validFrom = DateTime.Now.Date.AddDays(1);
@@ -85,6 +85,47 @@ public class InsuranceCompanyShould
         var selectedRisks = fixture.CreateMany<Risk>().ToList();
 
         MakeRepositoryReturnEffectivePolicies(nameOfInsuredObject, validFrom, 1);
+
+        var insuranceCompany = fixture.Create<InsuranceCompany>();
+
+        Assert.Throws<ExistingEffectivePolicyException>(() =>
+            insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, selectedRisks));
+    }
+
+    [Fact]
+    public void ThrowWhenValidTillDateForNewPolicyClashesWithExisting()
+    {
+        var nameOfInsuredObject = fixture.Create<string>();
+        var validFrom = DateTime.Now.Date.AddDays(1);
+        var validMonths = fixture.Create<short>();
+        var validTill = validFrom.AddMonths(validMonths);
+        var selectedRisks = fixture.CreateMany<Risk>().ToList();
+
+        MakeRepositoryReturnEffectivePolicies(nameOfInsuredObject, validTill, 1);
+
+        var insuranceCompany = fixture.Create<InsuranceCompany>();
+
+        Assert.Throws<ExistingEffectivePolicyException>(() =>
+            insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, selectedRisks));
+    }
+
+    [Fact]
+    public void ThrowWhenWholeInsurancePeriodForNewPolicyIsOverlappedByExisting()
+    {
+        var nameOfInsuredObject = fixture.Create<string>();
+        var validFrom = DateTime.Now.Date.AddDays(1);
+        var validMonths = fixture.Create<short>();
+        var validTill = validFrom.AddMonths(validMonths);
+        var selectedRisks = fixture.CreateMany<Risk>().ToList();
+
+        var policies = fixture.Build<Policy>()
+            .With(p => p.ValidFrom, validFrom.AddDays(-1))
+            .With(p => p.ValidTill, validTill.AddDays(1))
+            .CreateMany(1);
+
+        fixture.Freeze<IPolicyRepository>()
+            .FindByNameOfInsuredObject(nameOfInsuredObject)
+            .Returns(policies);
 
         var insuranceCompany = fixture.Create<InsuranceCompany>();
 

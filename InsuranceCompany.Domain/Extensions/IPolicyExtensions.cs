@@ -6,5 +6,10 @@
         {
             return new InsurancePeriod(policy.ValidFrom, policy.ValidTill);
         }
+
+        public static bool OverlapsWith(this IPolicy policy, InsurancePeriod period)
+        {
+            return policy.ValidFrom <= period.Till && period.From <= policy.ValidTill;
+        }
     }
 }

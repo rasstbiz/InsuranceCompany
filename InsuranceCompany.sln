@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InsuranceCompany.Domain", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InsuranceCompany.Domain.Tests", "InsuranceCompany.Domain.Tests\InsuranceCompany.Domain.Tests.csproj", "{8A67D559-7857-47CC-A5FB-8180CFDFBB7A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InsuranceCompany.DataAccess", "InsuranceCompany.DataAccess\InsuranceCompany.DataAccess.csproj", "{743DBC0E-08DC-48DB-9184-A52697B1FEC4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InsuranceCompany.DataAccess", "InsuranceCompany.DataAccess\InsuranceCompany.DataAccess.csproj", "{743DBC0E-08DC-48DB-9184-A52697B1FEC4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

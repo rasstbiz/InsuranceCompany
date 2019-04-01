@@ -10,6 +10,11 @@ namespace Domain
 
         public short PremiumMonths { get; }
 
+        public InsurancePeriod(DateTime pointInTime)
+            : this(pointInTime, pointInTime)
+        {
+        }
+
         public InsurancePeriod(DateTime validFrom, short validMonths)
         {
             if (validMonths < 1)
