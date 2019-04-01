@@ -23,7 +23,7 @@ namespace InsurancyCompany.Domain.Tests
         public void ThrowIfInsuredObjectNameIsNullOrEmpty(string nameOfInsuredObject)
         {
             var policy = new Policy();
-            var insurancePeriod = new InsurancePeriod(DateTime.Now, fixture.Create<short>());
+            var insurancePeriod = new NewInsurancePeriod(DateTime.Now, fixture.Create<short>());
             var insuredRisks = fixture.CreateMany<Risk>().ToList();
 
             var policyAggregate = new PolicyAggregate(policy);
@@ -37,7 +37,7 @@ namespace InsurancyCompany.Domain.Tests
         {
             var policy = new Policy();
             var nameOfInsuredObject = fixture.Create<string>();
-            var insurancePeriod = new InsurancePeriod(DateTime.Now, fixture.Create<short>());
+            var insurancePeriod = new NewInsurancePeriod(DateTime.Now, fixture.Create<short>());
             var insuredRisks = new List<Risk>();
 
             var policyAggregate = new PolicyAggregate(policy);
@@ -51,7 +51,7 @@ namespace InsurancyCompany.Domain.Tests
         {
             var policy = new Policy();
             var nameOfInsuredObject = fixture.Create<string>();
-            var insurancePeriod = new InsurancePeriod(DateTime.Now, fixture.Create<short>());
+            var insurancePeriod = new NewInsurancePeriod(DateTime.Now, fixture.Create<short>());
             var insuredRisks = fixture.CreateMany<Risk>().ToList();
 
             var policyAggregate = new PolicyAggregate(policy);
@@ -69,7 +69,7 @@ namespace InsurancyCompany.Domain.Tests
         {
             var policy = new Policy();
             var nameOfInsuredObject = fixture.Create<string>();
-            var insurancePeriod = new InsurancePeriod(DateTime.Now, fixture.Create<short>());
+            var insurancePeriod = new NewInsurancePeriod(DateTime.Now, fixture.Create<short>());
             var insuredRisks = fixture.CreateMany<Risk>().ToList();
 
             var policyAggregate = new PolicyAggregate(policy);
@@ -129,12 +129,28 @@ namespace InsurancyCompany.Domain.Tests
         }
 
         [Fact]
+        public void ThrowIfRemovedRiskEndsSameMonthWithPolicy()
+        {
+            var validTill = new DateTime(DateTime.Now.Year, 01, 15);
+            var risk = fixture.Create<Risk>();
+            var policy = fixture.Build<Policy>()
+                .With(p => p.ValidTill, new DateTime(DateTime.Now.Year, 01, 30))
+                .With(p => p.InsuredRisks, new List<Risk> { risk })
+                .Create();
+            policy.ValidTill = new DateTime(DateTime.Now.Year, 01, 30);
+
+            var policyAggregate = new PolicyAggregate(policy);
+
+            Assert.Throws<InvalidRiskRemovePeriodException>(() =>
+                policyAggregate.RemoveRisk(risk, validTill));
+        }
+
+        [Fact]
         public void RecalculatePremiumForRemovedRisk()
         {
             var validTill = DateTime.Now;
             var risk = fixture.Create<Risk>();
-            var policy = fixture
-                .Build<Policy>()
+            var policy = fixture.Build<Policy>()
                 .With(p => p.ValidTill, validTill.AddMonths(3))
                 .With(p => p.InsuredRisks, new List<Risk> { risk })
                 .Create();

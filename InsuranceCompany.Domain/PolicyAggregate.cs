@@ -13,7 +13,7 @@ namespace Domain
             this.policy = policy;
         }
 
-        public void Create(string nameOfInsuredObject, InsurancePeriod insurancePeriod, IList<Risk> insuredRisks)
+        public void Create(string nameOfInsuredObject, NewInsurancePeriod insurancePeriod, IList<Risk> insuredRisks)
         {
             if (string.IsNullOrEmpty(nameOfInsuredObject))
             {
@@ -35,10 +35,11 @@ namespace Domain
                 throw new ExistingRiskException("Risk with such name is already insured");
             }
 
-            var insurancePeriod = new InsurancePeriod(validFrom, policy.ValidTill);
+            var insurancePeriod = new NewInsurancePeriod(validFrom, policy.ValidTill);
             var newRiskInsurancePeriod = new RiskInsurancePeriod(insurancePeriod, risk);
+            var addedPremiumForNewRisk = newRiskInsurancePeriod.CalculatePremium();
 
-            policy.Premium += newRiskInsurancePeriod.CalculatePremium();
+            policy.Premium += addedPremiumForNewRisk;
             policy.InsuredRisks.Add(risk);
         }
 
@@ -48,11 +49,17 @@ namespace Domain
             {
                 throw new InvalidRiskException("Risk with such name is not insured");
             }
+            var calculateReturnedPremiumFrom = validTill.AddMonths(1);
+            if (calculateReturnedPremiumFrom > policy.ValidTill)
+            {
+                throw new InvalidRiskRemovePeriodException("Can not remove risk as it's insurance period ends at the same month with policy");
+            }
 
-            var insurancePeriod = new InsurancePeriod(validTill.AddMonths(1), policy.ValidTill);
+            var insurancePeriod = new InsurancePeriod(calculateReturnedPremiumFrom, policy.ValidTill);
             var nonInsuredRiskPeriod = new RiskInsurancePeriod(insurancePeriod, risk);
+            var returnedPremiumForRemovedRisk = nonInsuredRiskPeriod.CalculatePremium();
 
-            policy.Premium -= nonInsuredRiskPeriod.CalculatePremium();
+            policy.Premium -= returnedPremiumForRemovedRisk;
             policy.InsuredRisks.Remove(risk);
         }
     }
